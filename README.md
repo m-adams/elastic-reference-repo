@@ -6,26 +6,22 @@ This will hopefully act as a jumping off point for a new project and speed up ac
 
 ## VSCode setup reminders
 
-- Fork this repository
-- Clone the Fork in VSCode
-1. Open the command palette with the key combination of Ctrl + Shift + P 
-2. At the command palette prompt, enter gitcl , select the Git: Clone command, then select Clone from GitHub and press Enter
-3. When prompted for the Repository URL, select clone from GitHub, then press Enter
-
-- Creaate a new python virtual environment
-1. Open the command palette with the key combination of Ctrl + Shift + P 
-2. Search for the **Python: Create Environment** command, and select it
-3. Select Venv
-4. Pick the python version you want to use
-
-- Get your Elastic creds
-1. Go to your cluster in Elastic Cloud and get the CloudID
-2. Go to Kibana and generate a new API Key
-4. Make sure you select json as the format and then pick out the id and key
-
-- Create your .env file for testing
-1. Copy example.env to .env
-2. Add your parameters
+1. Fork this repository
+2. Clone the Fork in VSCode
+    1. Open the command palette with the key combination of Ctrl + Shift + P 
+    2. At the command palette prompt, enter gitcl , select the Git: Clone command, then select Clone from GitHub and press Enter
+    3. When prompted for the Repository URL, select clone from GitHub, then press Enter
+3. Creaate a new python virtual environment
+    1. Open the command palette with the key combination of Ctrl + Shift + P 
+    2. Search for the **Python: Create Environment** command, and select . Select Venv
+    3. Pick the python version you want to use
+4. Get your Elastic creds
+    1. Go to your cluster in Elastic Cloud and get the CloudID
+    2. Go to Kibana and generate a new API Key
+    3. Make sure you select json as the format and then pick out the id and key
+5. Create your .env file for testing
+    1. Copy .env.example to .env
+    2. Add your parameters
 
 
 ## Updating the requirements file
