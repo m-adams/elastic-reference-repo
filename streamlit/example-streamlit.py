@@ -9,33 +9,24 @@ from tools import myes
 import importlib
 importlib.reload(myes) # reload module to get latest changes
 
-# Required Environment Variables
 
-# cloud_id - Elastic Cloud Deployment ID
+# Seet environmental variables that can then be overwriten by .env file
+os.environ['INDEX_NAME'] = 'reference'
+os.environ['APP_NAME'] = 'My Demo App'
+os.environ['IMAGE_URL'] = 'https://www.elastic.co/static-res/images/elastic-logo-200.png'
+os.environ['DEMO_USER'] = 'demo'
+os.environ['DEMO_PASS'] = 'demo'
 
-extra_env_vars=[]
-# We can load the variables like this
-#extra_env_vars = [ 'INDEX_NAME', 'APP_NAME', 'IMAGE_URL', 'DEMO_USER', 'DEMO_PASS'  ]
+extra_env_vars = [ 'INDEX_NAME', 'APP_NAME', 'IMAGE_URL', 'DEMO_USER', 'DEMO_PASS'  ]
 
+# Load environment variables from .env file if it exists and initialise the elasticsearch connection
 es=myes.init(extra_env_vars)
 
-if(hasattr(myes,"DEMO_USER")): 
-    demo_username = myes.DEMO_USER
-else: 
-    demo_username = "demo"
-if(hasattr(myes,"DEMO_PASS")):
-    demo_password = myes.DEMO_PASS
-else:
-    demo_password = "demo"
-if(hasattr(myes,"APP_NAME")):
-    app_name = myes.APP_NAME
-else:
-    app_name = "My Demo App"
-if(hasattr(myes,"IMAGE_URL")):
-    image_url = myes.IMAGE_URL
-else:
-    image_url = "https://www.elastic.co/static-res/images/elastic-logo-200.png"
-
+demo_username = myes.DEMO_USER
+demo_password = myes.DEMO_PASS
+app_name = myes.APP_NAME
+image_url = myes.IMAGE_URL
+index_name = myes.INDEX_NAME
 
 
 
