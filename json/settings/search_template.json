@@ -1,0 +1,53 @@
+{
+    "indices": [ "test-elser" ],
+    "template": {
+      "script": {
+        "source": {
+          "from": "{{from}}",
+          "size": "{{size}}",
+          "fields": [
+            "{{#fields}}",
+            "{{.}}",
+            "{{/fields}}"
+            ],
+            "_source": false,
+            "highlight" : {
+              "type": "plain",
+              "pre_tags" : ["<mark>"],
+              "post_tags" : ["</mark>"],
+              "fields" : {
+                "description" : {}
+              }
+            },
+            "query": {
+              "bool": {
+                "should": [
+                  {
+                    "text_expansion": {
+                      "ml.inference.indexable_content_expanded.predicted_value": {
+                        "model_text": "{{query_string}}",
+                        "model_id": ".elser_model_1",
+                        "boost": 1
+                      }
+                    }
+                  },
+                  {
+                    "simple_query_string" : {
+                      "query" : "{{query_string}}",
+                      "fields" : [ "title^3", "indexable_content","description" ],
+                      "boost":4
+                    }
+                  }
+                  ]
+              }
+            }
+        },
+        "params": {
+          "query_string": "*",
+          "from": 0,
+          "size": 10,
+          "fields": ["title", "description", "link", "public_timestamp","content_id"]
+        }
+      }
+    }
+  }

@@ -1,0 +1,117 @@
+{ 
+    "dynamic": "true",
+    "dynamic_templates": [
+        {
+          "ml-model": {
+            "path_match":   "ml.inference.*_expanded.model_id",
+            "mapping": {
+              "type":       "keyword"
+            }
+          }
+        },
+        {
+            "ml-features": {
+              "path_match":   "ml.inference.*_expanded.predicted_value",
+              "mapping": {
+                "type": "rank_features"
+              }
+            }
+          }
+      ],
+    "properties": {
+      "content_id": {
+        "type": "keyword"
+      },
+      "content_purpose_supergroup": {
+        "type": "keyword"
+      },
+      "content_store_document_type": {
+        "type": "keyword"
+      },
+      "description": {
+        "type": "text",
+        "index_options": "freqs",
+        "analyzer": "iq_text_delimiter"
+      },
+      "document_type": {
+        "type": "keyword"
+      },
+      "elasticsearch_type": {
+        "type": "keyword"
+      },
+      "format": {
+        "type": "keyword"
+
+      },
+      "index": {
+        "type": "keyword"
+
+      },
+      "indexable_content": {
+        "type": "text",
+        "index_options": "freqs",
+        "analyzer": "iq_text_delimiter"
+
+      },
+      "is_historic": {
+        "type": "boolean"
+      },
+      "link": {
+        "type": "keyword"
+      },
+      "organisation_state": {
+        "type": "keyword"
+      },
+      "part_of_taxonomy_tree": {
+        "type": "keyword"
+      },
+      "parts": {
+        "properties": {
+          "body": {
+            "type": "text",
+            "index_options": "freqs",
+            "analyzer": "iq_text_delimiter",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
+          },
+          "slug": {
+            "type": "text",
+            "index_options": "freqs",
+            "analyzer": "iq_text_delimiter",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "title": {
+            "type": "text",
+            "index_options": "freqs",
+            "analyzer": "iq_text_delimiter",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      },
+      "public_timestamp": {
+        "type": "date"
+      },
+      "title": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    }
+}

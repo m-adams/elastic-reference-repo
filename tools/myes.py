@@ -7,22 +7,34 @@ import os
 from dotenv import load_dotenv
 
 
-def init( additional_env_vars=[],dotenv_path='../.env' ):
-    ### This function will load the environment variables from a local .env file
-    ### This function will also check that the required environment variables are set
-    ### This function will also write an example.env file if one does not exist
-    ### This function will also connect to elasticsearch and check that the connection is working
-    ### This function will return the elasticsearch connection object
+def init( additional_env_vars={},dotenv_path='../.env' ):
+    """ This function loads environment variables and connects to Elasticsearch
 
-    # Load environment variables from a local .env file
-    # This is a convenience for local development
+    Description:
+        It is asssumed there are base variables required which are 'CLOUD_ID', 'ELASTICSEARCH_API_KEY', 'ELASTICSEARCH_API_KEY_ID',
+        If you require additional variables specify them in the additional_env_vars dictionary along with any default values
+        If a .env file is found, it will overwite an existing environment variable with the value in the .env file
+        If the variable is not specififed in the .env or the file doesn't exist it will check if it's set and if not, use the default value
+        If you want to error out if a variable isn't present, set the default value to None.
+        It will also write out an example file with all the variables, but no values to help people get started
+    Args:
+        additional_env_vars (dict): A dictionary of additional environment variables to load and their default values
+        dotenv_path (str): The path to the .env file
 
-    # List all the required environment variables here
-    # I like this approach because it's easy to add new variables while also updating the checks for those variables and the example files
-    base_env_variables = [ 'CLOUD_ID', 'ELASTICSEARCH_API_KEY', 'ELASTICSEARCH_API_KEY_ID' ]
+    Returns:
+        Elasticsearch: An Elasticsearch connection object
+        dict: A dictionary of configuration variables
+    .
+    """
+
+    # We will store everything in a config dictionary
+    config={}
+
+    base_env_variables = {'CLOUD_ID': None, 'ELASTICSEARCH_API_KEY':None, 'ELASTICSEARCH_API_KEY_ID':None} 
+
 
     # Combine the base_env_variables with any additional_env_vars passed in to the init function
-    required_env_vars = base_env_variables + additional_env_vars
+    required_env_vars = {**base_env_variables, **additional_env_vars}   
 
     # Load environment variables from .env file if it exists
     if os.path.exists( dotenv_path):
@@ -33,10 +45,13 @@ def init( additional_env_vars=[],dotenv_path='../.env' ):
         print('Current dir = ', os.getcwd())
 
     # Load each required variable from the required_env_vars list in to  a local variable
-    for env_var in required_env_vars:
-        globals()[env_var] = os.getenv(env_var)
-        #ASSERT that the environment variable has been set
-        assert globals()[env_var], f'{env_var} environment variable not set'
+    for env_var in required_env_vars.keys():
+        config[env_var] = os.getenv(env_var)
+        if config[env_var] is None:
+            config[env_var] = required_env_vars[env_var]
+            print(f'No value found for {env_var} in .env file or environment, using default value of {config[env_var]}')
+        #ASSERT that the variable is not None
+        assert config[env_var], f'{env_var} environment variable not set'
 
 
     # Write an example.env file, overwriting if it exists
@@ -46,19 +61,64 @@ def init( additional_env_vars=[],dotenv_path='../.env' ):
             f.write(f'{env_var}=\n')
 
     # Connect to Elasticsearch and check the connection is working
-    es = Elasticsearch(cloud_id=CLOUD_ID, # type: ignore
-        api_key=(ELASTICSEARCH_API_KEY_ID, ELASTICSEARCH_API_KEY) # type: ignore
+    es = Elasticsearch(cloud_id=config['CLOUD_ID'], 
+        api_key=(config['ELASTICSEARCH_API_KEY_ID'], config['ELASTICSEARCH_API_KEY'])
     )
 
     #print out if the connection was sucessful or not
     if es.ping():
         print('Connected to Elasticsearch')
-        return es
     else:
         print('Connection to Elasticsearch failed')
-        return None
+        return None, config
+    
+    
+    return es, config
 
+# Bulk indexing function
+def index_documents(elasticsearch_connection: Elasticsearch ,\
+                    documents: list,\
+                    index_name: str,\
+                    batch_size: int = 1000):
+    """ This function indexes a list of documents in to Elasticsearch
 
+    Description:
+        This function uses the builk API to index documents in batches of 1000
+        It will print out the progress of the indexing
+    Args:
+        elasticsearch_connection (Elasticsearch): An Elasticsearch connection object
+        documents (list): A list of documents (dict) to index. If they have an '_id' filed it will be used as the document id
+        index_name (str): The name of the index to index the documents in to
+        batch_size (int): The number of documents to index in each batch
+
+    Returns:
+        int: The number of documents indexed
+    .
+    """
+
+    actions = []
+    batch = []
+    total_indexed = 0
+    for i in range(0, len(documents), batch_size):
+        start=i
+        end=min(i+batch_size,len(documents))
+        print(f'Batching docs: {start} to {end} of {len(documents)}')
+        batch = documents[start:end]
+        actions = []
+        for doc in batch:
+            action = {
+                "_index": index_name,
+                "_source": doc
+            }
+            if doc.has_key("_id"):
+                id=doc.pop("_id")
+                action["_id"]=id
+            actions.append(action)
+    
+        success, _ = helpers.bulk(elasticsearch_connection, actions=actions,raise_on_error=False)
+        print(f'Indexed {success} documents')
+        total_indexed += success
+    return total_indexed
 
 #def getSearchTemplates(es):
     # Get the list of search templates

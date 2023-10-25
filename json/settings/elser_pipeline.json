@@ -1,0 +1,28 @@
+{
+  "description":"A pipeline to expand the indexable content field using ELSER",
+  "version": 1,
+  "processors":[
+    {
+      "remove": {
+        "field": "ml.inference.indexable_content_expanded",
+        "ignore_missing": true
+      }
+    },
+    {
+      "set": {
+        "field": "indexable_content",
+        "override": false,
+        "copy_from": "title"
+      }
+    },
+    {
+      "inference": {
+        "field_map": {
+          "indexable_content": "text_field"
+        },
+        "model_id": ".elser_model_1",
+        "target_field": "ml.inference.indexable_content_expanded"
+      }
+    }
+  ]
+}

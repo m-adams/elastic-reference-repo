@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elastic-app
+  labels:
+    app: elastic-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: elastic-app
+  template:
+    metadata:
+      labels:
+        app: elastic-app
+    spec:
+      containers:
+      - name: streamlit-webserver
+        image: [PATHRO_IMAGE]
+        ports:
+            - containerPort: 8501
+        imagePullPolicy: Always
+        envFrom:
+        - secretRef:
+            name: elastic-app

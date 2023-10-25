@@ -10,26 +10,24 @@ import importlib
 importlib.reload(myes) # reload module to get latest changes
 
 
-# Seet environmental variables that can then be overwriten by .env file
-os.environ['INDEX_NAME'] = 'reference'
-os.environ['APP_NAME'] = 'My Demo App'
-os.environ['IMAGE_URL'] = 'https://www.elastic.co/static-res/images/elastic-logo-200.png'
-os.environ['DEMO_USER'] = 'demo'
-os.environ['DEMO_PASS'] = 'demo'
-
-extra_env_vars = [ 'INDEX_NAME', 'APP_NAME', 'IMAGE_URL', 'DEMO_USER', 'DEMO_PASS'  ]
+# Required settings and default in a dictionary
+param_defaults = {
+    'INDEX_NAME': 'reference',
+    'DATA_DIR': '../json/data',
+    'APP_NAME': 'My Demo App',
+    'IMAGE_URL': 'https://www.elastic.co/static-res/images/elastic-logo-200.png',
+    'DEMO_USER': 'demo',
+    'DEMO_PASS': 'demo'
+}
 
 # Load environment variables from .env file if it exists and initialise the elasticsearch connection
-es=myes.init(extra_env_vars)
+es,config=myes.init(param_defaults,dotenv_path='../.env')
 
-demo_username = myes.DEMO_USER
-demo_password = myes.DEMO_PASS
-app_name = myes.APP_NAME
-image_url = myes.IMAGE_URL
-index_name = myes.INDEX_NAME
-
-
-
+demo_username = config['DEMO_USER']
+demo_password = config['DEMO_PASS']
+app_name = config['APP_NAME']
+image_url = config['IMAGE_URL']
+index_name = config['INDEX_NAME']
 
 # Setup basic authentication to the app
 hashed_pass=stauth.Hasher([demo_password]).generate()[0]

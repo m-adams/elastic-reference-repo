@@ -35,3 +35,8 @@ pip freeze > requirements,txt
 ## Running streamlit in VSCode
 The repository chould contain a luanch.json which configures launching streamlit
 To run Streamlit, head to the file and in the Run/Debug in the left menu you should be able to select Python:Streamlit
+
+
+## VSCode Troubleshooting
+### Can't find the package I installed with pip
+You can get issues where the terminal stops using the correct interpreter and therefore pip install etc stops working. The easiest solution is to replace the venv by going to the command pallet to create a new one and the select relete and recreate.
