@@ -25,6 +25,6 @@ class SystemLogFilter(logging.Filter):
         if not hasattr(record, 'extra'):
             record.extra= {"event.dataset": self.EVENT_DATASET_LOGS}
         else:
-          if not record.extra.has_key('event.dataset'):
+          if not hasattr(record.extra,'event.dataset'):
             record.extra["event.dataset"]= self.EVENT_DATASET_LOGS
         return True

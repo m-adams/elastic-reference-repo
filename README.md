@@ -24,6 +24,17 @@ This will hopefully act as a jumping off point for a new project and speed up ac
     2. Add your parameters
 
 
+## Structure
+
+### /tools
+This is where reusable functions live in modules.
+As projects require functionallity repeadedly, it should be matured in to modules held here.
+
+The current modules are:
+* myes - Tools for initialising and working with elasticsearch such as extra helper functions
+* eslogger - A hacky way to get logs sent directly to Elasticsearch rather than the offical approach with Elastic agent. This can be useful for simple demos
+
+
 ## Updating the requirements file
 
 If new dependencies get added, update the requirements file using

@@ -48,6 +48,7 @@ def init( additional_env_vars={},dotenv_path='../.env' ):
     for env_var in required_env_vars.keys():
         config[env_var] = os.getenv(env_var)
         if config[env_var] is None:
+            os.environ[env_var] = required_env_vars[env_var] # Make sure it is now an env variable for modules that look directly for env vars
             config[env_var] = required_env_vars[env_var]
             print(f'No value found for {env_var} in .env file or environment, using default value of {config[env_var]}')
         #ASSERT that the variable is not None
