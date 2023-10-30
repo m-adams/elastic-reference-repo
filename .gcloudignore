@@ -6,3 +6,4 @@ __pycache__
 .env.example
 ./reference-snippets
 ./k8s
+*.terraform*

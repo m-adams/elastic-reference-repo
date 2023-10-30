@@ -32,7 +32,7 @@ As projects require functionallity repeadedly, it should be matured in to module
 
 The current modules are:
 * myes - Tools for initialising and working with elasticsearch such as extra helper functions
-* eslogger - A hacky way to get logs sent directly to Elasticsearch rather than the offical approach with Elastic agent. This can be useful for simple demos
+* loggeres - A hacky way to get logs sent directly to Elasticsearch rather than the offical approach with Elastic agent. This can be useful for simple demos
 
 
 ## Updating the requirements file

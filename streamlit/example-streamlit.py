@@ -14,9 +14,9 @@ import logging
 sys.path.append("../") # go to parent dir this help imports work as expected
 # Import myes which is some tools to get up and running faster
 from tools import myes
-from tools import eslogger
+from tools import loggeres
 importlib.reload(myes) # reload module to get latest changes
-importlib.reload(eslogger)
+importlib.reload(loggeres)
 
 global app_name
 @st.cache_resource
@@ -53,13 +53,13 @@ def __init__():
     elasticapm.instrument()
 
     # Setup logging to the same Elastic cluster
-    handler = eslogger.ElasticHandler(logging.INFO,es,config['LOGS_INDEX_NAME'])
+    handler = loggeres.ElasticHandler(logging.INFO,es,config['LOGS_INDEX_NAME'])
     handler.setFormatter(ecs_logging.StdlibFormatter())
     global logger 
     logger = logging.getLogger("app")
     logger.setLevel(logging.INFO)
     logger.addHandler(handler)
-    logger.addFilter(eslogger.SystemLogFilter(config['EVENT_DATASET_LOGS']))
+    logger.addFilter(loggeres.SystemLogFilter(config['EVENT_DATASET_LOGS']))
 
     # Set some variables that are a bit nicer to read from our config dictionary
     global app_name, image_url, index_name

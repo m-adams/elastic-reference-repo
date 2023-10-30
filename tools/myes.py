@@ -2,9 +2,7 @@
 # impart modules to connect to elasticsearch
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
-import json
-import os
-from dotenv import load_dotenv
+from  tools import configes
 
 
 def init( additional_env_vars={},dotenv_path='../.env' ):
@@ -27,54 +25,40 @@ def init( additional_env_vars={},dotenv_path='../.env' ):
     .
     """
 
-    # We will store everything in a config dictionary
-    config={}
+    # If we want tp be able to handle API auth or user,password then we can't fail if any isn't set so we will set a default
 
-    base_env_variables = {'CLOUD_ID': None, 'ELASTICSEARCH_API_KEY':None, 'ELASTICSEARCH_API_KEY_ID':None} 
-
+    base_env_variables = {'CLOUD_ID': None, 'ELASTICSEARCH_API_KEY':'NaN', 'ELASTICSEARCH_API_KEY_ID':'NaN','ELASTICSEARCH_USERNAME':'NaN','ELASTICSEARCH_PASSWORD':'NaN'} 
 
     # Combine the base_env_variables with any additional_env_vars passed in to the init function
     required_env_vars = {**base_env_variables, **additional_env_vars}   
 
-    # Load environment variables from .env file if it exists
-    if os.path.exists( dotenv_path):
-        print('Loading environment variables from .env file')
-        load_dotenv(override=True,dotenv_path=dotenv_path)
-    else:
-        print('No .env file found at ' + dotenv_path)
-        print('Current dir = ', os.getcwd())
+    config = configes.load_config_from_env(env_filepath=dotenv_path,overwrite=False,config_vars=required_env_vars)
 
-    # Load each required variable from the required_env_vars list in to  a local variable
-    for env_var in required_env_vars.keys():
-        config[env_var] = os.getenv(env_var)
-        if config[env_var] is None:
-            os.environ[env_var] = required_env_vars[env_var] # Make sure it is now an env variable for modules that look directly for env vars
-            config[env_var] = required_env_vars[env_var]
-            print(f'No value found for {env_var} in .env file or environment, using default value of {config[env_var]}')
-        #ASSERT that the variable is not None
-        assert config[env_var], f'{env_var} environment variable not set'
+    if config['ELASTICSEARCH_API_KEY'] != 'NaN' and config['ELASTICSEARCH_API_KEY_ID'] != 'NaN':
+        print('Using API key authentication')
+        # Connect to Elasticsearch and check the connection is working
+        es = Elasticsearch(cloud_id=config['CLOUD_ID'], 
+            api_key=(config['ELASTICSEARCH_API_KEY_ID'], config['ELASTICSEARCH_API_KEY'])
+        )
+        #print out if the connection was sucessful or not
+        if es.ping():
+            print('Connected to Elasticsearch')
+            return es, config
+        else:
+            print('Connection to Elasticsearch failed')
 
-
-    # Write an example.env file, overwriting if it exists
-    # This file gives somebody starting of an example ,env file to use
-    with open( dotenv_path+".example", 'w') as f:
-        for env_var in required_env_vars:
-            f.write(f'{env_var}=\n')
-
-    # Connect to Elasticsearch and check the connection is working
+    print('Using username/password authentication')
     es = Elasticsearch(cloud_id=config['CLOUD_ID'], 
-        api_key=(config['ELASTICSEARCH_API_KEY_ID'], config['ELASTICSEARCH_API_KEY'])
+        http_auth=(config['ELASTICSEARCH_USERNAME'], config['ELASTICSEARCH_PASSWORD'])
     )
-
     #print out if the connection was sucessful or not
     if es.ping():
         print('Connected to Elasticsearch')
+        return es, config
     else:
         print('Connection to Elasticsearch failed')
         return None, config
-    
-    
-    return es, config
+
 
 # Bulk indexing function
 def index_documents(elasticsearch_connection: Elasticsearch ,\
