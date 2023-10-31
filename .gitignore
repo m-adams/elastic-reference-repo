@@ -4,3 +4,4 @@ __pycache__
 .DS_store
 *.terraform*
 *tfstate*
+.python-version
