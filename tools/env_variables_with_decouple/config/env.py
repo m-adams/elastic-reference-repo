@@ -17,3 +17,5 @@ LLM_SERVICE = config("LLM_SERVICE", cast=str, default="supercoolLLM")
 
 SOME_NUMBER = config("SOME_NUMBER", cast=str, default=10)
 ANOTHER_NUMBER = config("ANOTHER_NUMBER", cast=int, default=10)
+
+TEST_VAR = config("TEST_VAR", cast=str, default="test")
