@@ -1,13 +1,8 @@
 terraform {
   required_version = ">= 1.0.0"
-
   required_providers {
     ec = {
       source = "elastic/ec"
-    }
-    elasticstack = {
-      source  = "elastic/elasticstack"
-      version = "~>0.9"
     }
   }
 }
@@ -19,7 +14,7 @@ variable "name" {
   type = string
   default = "my_example_deployment"
 }
-variable "apikey" {
+variable "EC_API_KEY" {
   type = string
   sensitive = true
 }
@@ -32,9 +27,8 @@ variable "deployment_template_id" {
   default = "gcp-memory-optimized-v2"
 }
 provider "ec" {
-  apikey= var.apikey
+  apikey= var.EC_API_KEY
 }
-
 resource "ec_deployment"  "example" {
   name = var.name
   region = var.region
@@ -59,17 +53,3 @@ resource "ec_deployment"  "example" {
   enterprise_search = {}
   integrations_server = {}
 }
-
-# See docs here https://registry.terraform.io/providers/elastic/elasticstack/latest/docs/guides/elasticstack-and-cloud
-provider "elasticstack" {
-  # Use our Elastic Cloud deployment outputs for connection details.
-  # This also allows the provider to create the proper relationships between the two resources.
-  elasticsearch {
-    endpoints = ["${ec_deployment.example.elasticsearch[0].https_endpoint}"]
-    username  = ec_deployment.example.elasticsearch_username
-    password  = ec_deployment.example.elasticsearch_password
-  }
-}
-
-
-
