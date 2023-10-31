@@ -9,7 +9,7 @@ from tools import configes
 from tools import myes
 reload(myes)
 
-def create_or_return_terraform_cluster(terraform_dir: str,parameters={'EC_API_KET':None},env_filepath="./.env"):
+def create_or_return_terraform_cluster(terraform_dir: str,parameters={'EC_API_KEY':None},env_filepath="./.env"):
     """
     Create or return a Cluster in Elastic Cloud using Terraform
 
@@ -31,14 +31,34 @@ def create_or_return_terraform_cluster(terraform_dir: str,parameters={'EC_API_KE
     # Need to make sure the API key is loaded
     if 'EC_API_KEY' not in parameters:
         parameters['EC_API_KEY']=None    # Load local enviroment variables from .env file if it exists
-    variables = configes.load_config_from_env(env_filepath,parameters)
+    
+    variables = configes.load_config_from_env(env_filepath,parameters,config_vars=parameters)
 
+    assert "EC_API_KEY" in variables, "You must set the EC_API_KEY environment variable"
+    assert variables['EC_API_KEY'] is not None, "You must set the EC_API_KEY environment variable"  
     # Initialize Terraform and manage state
-    tf=Terraform(working_dir=terraform_dir,variables=variables)
+    tf=Terraform(working_dir=terraform_dir)
     # Show the current state
     tf.init()
-    return_code, stdout, stderr =tf.apply(skip_plan=True, capture_output=False,variables=variables)
+    print("Terraform initialized")
+    print("Checking if the cluster exists")
+    return_code, stdout, stderr = tf.plan(detailed_exitcode=True, capture_output=True, variables=variables) 
+    print("Terraform plan code = ", return_code)    
 
+    if return_code == 0:
+        print("The cluster already exists, no changes required")
+    if return_code == 2:
+        print("It looks like changes are required, this may tale some time")
+        print(stdout)
+    if return_code == 1:
+        print("Error running terraform plan")
+        print(stdout)
+        print(stderr)
+        return None, None
+
+    return_code, stdout, stderr =tf.apply(capture_output=False,variables=variables, input=False,refresh=False,skip_plan=True,auto_approve=True)
+
+    print(return_code, stdout, stderr)
     absolute_terraform_dir = os.path.abspath(terraform_dir) 
     cluster_details = {'terraform_dir': absolute_terraform_dir}
     resources=tf.tfstate.resources
