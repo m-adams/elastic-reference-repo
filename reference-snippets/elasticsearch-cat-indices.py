@@ -4,6 +4,7 @@ from getpass import getpass
 
 import requests
 
+## Latest version of Code, including better CLI functionality, in it's own git repo - https://github.com/face0b1101/get-es-index-sizes
 
 def fetch_es_data(es_url: str, username: str, password: str):
     """
