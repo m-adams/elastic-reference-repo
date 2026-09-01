@@ -3,7 +3,8 @@
 # Docker files can only copy from bellow them in the dir structure
 # If you are using a cloud build. You should clean up the folder because otherwise wit will send everything even if it's not used
 
-FROM python:3.9-slim
+# Current requirements.txt needs Python 3.11+ (streamlit >=1.42, pandas >=2.2)
+FROM python:3.12-slim
 
 WORKDIR /app
 
