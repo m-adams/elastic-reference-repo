@@ -108,25 +108,34 @@ es,config,logger=__init__()
 demo_username = config['DEMO_USER']
 demo_password = config['DEMO_PASS']
 # Setup basic authentication to the streamlit app
-hashed_pass=stauth.Hasher([demo_password]).generate()[0]
-creds={}
-creds['usernames']={}
-creds['usernames'][demo_username] = {'password': hashed_pass, 'name': demo_username}
+# streamlit-authenticator >=0.4 hashes the passwords in the credentials dict for
+# us (auto_hash=True) and returns the login result via st.session_state.
+creds = {
+    'usernames': {
+        demo_username: {
+            'name': demo_username,
+            'password': demo_password,
+        }
+    }
+}
 authenticator = stauth.Authenticate(
     creds,
-    "examplecookiename-demo",
-    "thisisacookie",
-    30,
-    '')
-name, authentication_status, username = authenticator.login('Login', 'main')
+    cookie_name="examplecookiename-demo",
+    cookie_key="thisisacookie",
+    cookie_expiry_days=30,
+)
+authenticator.login(location='main')
+name = st.session_state.get('name')
+username = st.session_state.get('username')
+authentication_status = st.session_state.get('authentication_status')
 
 if authentication_status:
     authenticator.logout('Logout', 'main')
     st.write(f'Welcome *{name}*')
     app_main()
-elif authentication_status == False:
+elif authentication_status is False:
     st.error('Username/password is incorrect')
-elif authentication_status == None:
+else:
     st.warning('Please enter your username and password')
 
 
